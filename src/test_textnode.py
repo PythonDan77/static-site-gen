@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType
+from textnode import *
 
 
 class TestTextNode(unittest.TestCase):
@@ -21,6 +21,46 @@ class TestTextNode(unittest.TestCase):
     def test_url(self):
         node = TextNode("Another text node", TextType.BOLD, "http://Youtube.com")
         self.assertIsNotNone(node.url)
+
+#===============================text_node_to_html_node=============================
+
+    def test_text(self):
+        node = TextNode("This is a text node", TextType.TEXT)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, None)
+        self.assertEqual(html_node.value, "This is a text node")
+
+    def test_tag(self):
+        node = TextNode("This is a bold node", TextType.BOLD)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "b")
+    
+    def test_link(self):
+        node = TextNode("This is a text node", TextType.LINK, url="http://Youtube.com")
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.props, {"href": "http://Youtube.com"})
+
+    def test_link_fail(self):
+        with self.assertRaises(ValueError):
+            node = TextNode("This is a link node", TextType.LINK)
+            html_node = text_node_to_html_node(node)
+
+    def test_image(self):
+        node = TextNode("This is a image node", TextType.IMAGE, url="http://Youtube.com")
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.props, {"src": "http://Youtube.com", "alt": "image"})
+
+    def test_image_fail(self):
+        with self.assertRaises(ValueError):
+            node = TextNode("This is a image node", TextType.IMAGE)
+            html_node = text_node_to_html_node(node)
+
+    def test_wrong_value(self):
+        with self.assertRaises(ValueError):
+            node = TextNode("This is a image node", TextType.TEXT)
+            node.text_type = "something_else"
+            html_node = text_node_to_html_node(node)
+
 
 
 if __name__ == "__main__":
