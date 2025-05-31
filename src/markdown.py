@@ -1,4 +1,5 @@
 import re
+from textnode import *
 
 def extract_markdown_images(text):
     if not isinstance(text, str):
@@ -28,7 +29,7 @@ def split_nodes_image(old_nodes):
             sections = text_copy.split(f"![{alt}]({link})", 1)
             if sections[0]:
                 result.append(TextNode(sections[0], TextType.TEXT))
-            result.append(TextNode(alt, TextType.LINK, link))
+            result.append(TextNode(alt, TextType.IMAGE, link))
             text_copy = sections[1]
         if text_copy:
             result.append(TextNode(text_copy, TextType.TEXT))
@@ -57,4 +58,19 @@ def split_nodes_link(old_nodes):
             text_copy = sections[1]
         if text_copy:
             result.append(TextNode(text_copy, TextType.TEXT))
+    return result
+
+def text_to_textnodes(text):
+    result = []
+
+    if text:
+        new_node = TextNode(text,TextType.TEXT)
+
+        bold_check = split_nodes_delimiter([new_node],"**", TextType.BOLD)
+        italic_check = split_nodes_delimiter(bold_check,"_", TextType.ITALIC)
+        code_check = split_nodes_delimiter(italic_check,"`", TextType.CODE)
+        image_check = split_nodes_image(code_check)
+        link_check = split_nodes_link(image_check)
+        result.extend(link_check)
+
     return result
