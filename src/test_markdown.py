@@ -2,6 +2,7 @@ import unittest
 from markdown import *
 from textnode import *
 
+#===============================Extract Markdown images/links=============================
 class Test_MarkDown_Func(unittest.TestCase):
     def test_extract_markdown_images(self):
         matches = extract_markdown_images("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)")
@@ -34,6 +35,57 @@ class Test_MarkDown_Func(unittest.TestCase):
     def test_extract_markdown_links_wrong_input(self):
         matches = extract_markdown_links("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)")
         self.assertListEqual([], matches)
+
+#===============================split_nodes_delimiter=============================
+class Testsplit_nodes_delimiter(unittest.TestCase):
+
+    def test_wrong_type(self):
+        node = TextNode("This is a `code` node", TextType.CODE)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+        self.assertEqual(new_nodes, [node])
+    
+    def test_inequal_delimiter(self):
+        with self.assertRaises(Exception):
+            node = TextNode("This is a `code node", TextType.TEXT)
+            new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+
+    def test_no_delimiter(self):
+        with self.assertRaises(Exception):
+            node = TextNode("This is a `code` node", TextType.TEXT)
+            new_nodes = split_nodes_delimiter([node], "", TextType.CODE)
+
+    def test_wrong_delimiter(self):
+        with self.assertRaises(Exception):
+            node = TextNode("This is a `code` node", TextType.TEXT)
+            new_nodes = split_nodes_delimiter([node], "!", TextType.CODE)
+
+    def test_bold_delimiter(self):
+        node = TextNode("This is a **bold** node", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertEqual(new_nodes, [TextNode("This is a ", TextType.TEXT), TextNode("bold", TextType.BOLD), TextNode(" node", TextType.TEXT)])
+
+    def test_double_bold_delimiter(self):
+        node = TextNode("This is a **bold** node with double **bold**", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertEqual(new_nodes, [TextNode("This is a ", TextType.TEXT), TextNode("bold", TextType.BOLD), TextNode(" node with double ", TextType.TEXT),
+                                     TextNode("bold", TextType.BOLD)])
+
+    def test_italic_delimiter(self):
+        node = TextNode("This is an _italic_ node", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC)
+        self.assertEqual(new_nodes, [TextNode("This is an ", TextType.TEXT), TextNode("italic", TextType.ITALIC), TextNode(" node", TextType.TEXT)])
+
+    def test_code_delimiter(self):
+        node = TextNode("This is a `code` node", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+        self.assertEqual(new_nodes, [TextNode("This is a ", TextType.TEXT), TextNode("code", TextType.CODE), TextNode(" node", TextType.TEXT)])
+    
+    def test_text_no_delimiter(self):
+        node = TextNode("This is a code node", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.CODE)
+        self.assertEqual(new_nodes, [TextNode("This is a code node", TextType.TEXT)])
+
+#===============================split_nodes_images_links=============================
 
 class Test_Split_Nodes_Func(unittest.TestCase):
 
@@ -290,6 +342,9 @@ class Test_Text_TextNodes_Func(unittest.TestCase):
                         ],
                            new_text)
 
+
     
+
+
 if __name__ == "__main__":
     unittest.main()
