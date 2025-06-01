@@ -1,19 +1,34 @@
 from enum import Enum  
 import re
+from markdown import *
 
 
 class BlockType(Enum):
-
     PARAGRAPH = "paragraph"
-    HEADING = "heading"
+    HEADING1 = "heading1"
+    HEADING2 = "heading2"
+    HEADING3 = "heading3"
+    HEADING4 = "heading4"
+    HEADING5 = "heading5"
+    HEADING6 = "heading6"
     CODE = "code"
     QUOTE = "quote"
     UNORDERED = "unordered_list"
     ORDERED = "ordered_list"
 
 def block_to_block_type(block):
-    if re.match(r"^#{1,6} .+", block):
-        return BlockType.HEADING
+    if block.startswith("#" * 6 + " "):
+        return BlockType.HEADING6
+    if block.startswith("#" * 5 + " "):
+        return BlockType.HEADING5
+    if block.startswith("#" * 4 + " "):
+        return BlockType.HEADING4
+    if block.startswith("#" * 3 + " "):
+        return BlockType.HEADING3
+    if block.startswith("#" * 2 + " "):
+        return BlockType.HEADING2
+    if block.startswith("# "):
+        return BlockType.HEADING1
     if block.startswith("```") and block.endswith("```"):
         return BlockType.CODE
     if block.startswith(">"):
@@ -26,7 +41,7 @@ def block_to_block_type(block):
             for i in range(1, len(matches)):
                 if int(matches[i]) != int(matches[i-1]) + 1:
                     return BlockType.PARAGRAPH
-            return BlockType.ORDERED  
+            return BlockType.ORDERED
     return BlockType.PARAGRAPH
     
 def markdown_to_blocks(markdown):

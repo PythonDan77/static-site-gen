@@ -5,15 +5,15 @@ from blocks import *
 class Test_Block_to_Block_Func(unittest.TestCase):
     def test_block_to_block_h1(self):
         result = block_to_block_type("# HEADING 1")
-        self.assertEqual(result, BlockType.HEADING)
+        self.assertEqual(result, BlockType.HEADING1)
 
     def test_block_to_block_h3(self):
         result = block_to_block_type("### HEADING 3")
-        self.assertEqual(result, BlockType.HEADING)
+        self.assertEqual(result, BlockType.HEADING3)
 
     def test_block_to_block_h6(self):
         result = block_to_block_type("###### HEADING 6")
-        self.assertEqual(result, BlockType.HEADING)
+        self.assertEqual(result, BlockType.HEADING6)
 
     def test_block_to_block_h7(self):
         result = block_to_block_type("######## HEADING 7")

@@ -1,5 +1,6 @@
 import re
 from textnode import *
+from blocks import *
 
 
 def extract_markdown_images(text):
@@ -101,6 +102,7 @@ def text_to_textnodes(text):
         result.extend(link_check)
 
     return result
+
 
 
 
