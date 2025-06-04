@@ -1,7 +1,21 @@
 import re
+from enum import Enum  
 from textnode import *
-from blocks import *
+from htmlnode import *
 
+
+class BlockType(Enum):
+    PARAGRAPH = "p"
+    HEADING1 = "h1"
+    HEADING2 = "h2"
+    HEADING3 = "h3"
+    HEADING4 = "h4"
+    HEADING5 = "h5"
+    HEADING6 = "h6"
+    CODE = "code"
+    QUOTE = "blockquote"
+    UNORDERED = "ul"
+    ORDERED = "ol"
 
 def extract_markdown_images(text):
     if not isinstance(text, str):
@@ -103,6 +117,97 @@ def text_to_textnodes(text):
 
     return result
 
+#---------------------------------NEW-------------------------------------------
 
 
+def markdown_to_html_node(markdown):
+    markdown = markdown.strip()
+    blocks = markdown_to_blocks(markdown)  
+    result = []
 
+    for block in blocks:
+
+        block_type = block_to_block_type(block)  
+
+        if block_type == BlockType.CODE:
+            result.append(ParentNode("pre",[text_node_to_html_node(TextNode(unchanged_code(block),TextType.CODE))]))    
+        elif block_type == BlockType.ORDERED:
+            result.append(ParentNode("ol", list_children(block)))
+        elif block_type == BlockType.UNORDERED:
+            result.append(ParentNode("ul", list_children(block)))
+        elif "h" in block_type.value:
+            result.append(ParentNode(block_type.value, heading_children(block)))
+        elif block_type == BlockType.PARAGRAPH:
+            result.append(ParentNode("p", paragraph_children(block)))
+        elif block_type == BlockType.QUOTE:
+            result.append(ParentNode("blockquote", paragraph_children(block)))
+
+    return ParentNode("div",result)
+
+def unchanged_code(markdown):
+    markdown = re.sub(r'^```|```$', '', markdown).strip()
+    nodes = markdown.split("\n")
+    new_markdown = "".join(node.lstrip() + "\n" for node in nodes)
+    return new_markdown
+    
+def paragraph_children(markdown):
+    all_nodes = []
+    item = markdown.replace("\n", " ").replace("> ", "")
+    item = re.sub(r'\s+', ' ', item).strip()
+    new_node = text_to_textnodes(item)  
+    for node in new_node:
+        all_nodes.append(text_node_to_html_node(node))
+    return all_nodes
+
+def list_children(markdown):
+    final_parent = []
+    items = markdown.split("\n")
+    
+    for item in items:
+        match = re.findall(r"^(?:\d+\.\s|[-*]\s)(.+)", item)
+        new_node = text_to_textnodes(match[0])
+        list_items = [text_node_to_html_node(node) for node in new_node]
+        final_parent.append(ParentNode("li", list_items))
+    return final_parent
+
+def heading_children(markdown):
+    text = re.sub(r'^#{1,6}\s+', '', markdown)
+    new_node = text_to_textnodes(text)  
+    all_nodes = [text_node_to_html_node(node) for node in new_node]
+    return all_nodes
+
+#-------------------------------Block Functions-----------------------
+
+def block_to_block_type(block):
+    if block.startswith("#" * 6 + " "):
+        return BlockType.HEADING6
+    if block.startswith("#" * 5 + " "):
+        return BlockType.HEADING5
+    if block.startswith("#" * 4 + " "):
+        return BlockType.HEADING4
+    if block.startswith("#" * 3 + " "):
+        return BlockType.HEADING3
+    if block.startswith("#" * 2 + " "):
+        return BlockType.HEADING2
+    if block.startswith("# "):
+        return BlockType.HEADING1
+    if block.startswith("```") and block.endswith("```"):
+        return BlockType.CODE
+    if block.startswith(">"):
+        return BlockType.QUOTE
+    if block.startswith("- ") or block.startswith("* "):
+        return BlockType.UNORDERED
+    if re.match(r"^(\d+)\.\s", block, re.MULTILINE):
+        matches = re.findall(r"^(\d+)\.\s+.+", block, re.MULTILINE)
+        if matches and int(matches[0]) == 1:
+            for i in range(1, len(matches)):
+                if int(matches[i]) != int(matches[i-1]) + 1:
+                    return BlockType.PARAGRAPH
+            return BlockType.ORDERED
+    return BlockType.PARAGRAPH
+    
+def markdown_to_blocks(markdown):
+    modified = []
+    if isinstance(markdown, str):
+        modified = [line.strip() for line in markdown.split("\n\n") if line.strip()]
+    return modified
