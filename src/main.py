@@ -33,15 +33,6 @@ def copy_data(src, dst):
             print(f"Created directory: {dst_item}")
             copy_data(src_item, dst_item)
 
-
-
-
-
-    
-
-
-
-
 if __name__ == "__main__":
 
     main()

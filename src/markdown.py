@@ -4,7 +4,6 @@ from enum import Enum
 from textnode import *
 from htmlnode import *
 
-
 class BlockType(Enum):
     PARAGRAPH = "p"
     HEADING1 = "h1"
@@ -119,7 +118,6 @@ def text_to_textnodes(text):
     return result
 
 #---------------------------------Block to HTML-------------------------------------------
-
 
 def markdown_to_html_node(markdown):
     markdown = markdown.strip()
