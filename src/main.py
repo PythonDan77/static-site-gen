@@ -1,12 +1,17 @@
 import os
 import shutil
+import sys
 from textnode import *
 from markdown import generate_page, generate_pages_recursive
 
 def main():
-    os_copy("static", "public")
-    # generate_page("content/index.md","template.html","public/index.html")
-    generate_pages_recursive("content", "template.html", "public")
+    basepath = "/"
+    destination = "docs"
+    if len(sys.argv) == 2:
+        basepath = sys.argv[1]
+    
+    os_copy("static", destination)
+    generate_pages_recursive("content", "template.html", destination, basepath)
 
 
 def os_copy(src, dst):
