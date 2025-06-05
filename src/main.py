@@ -7,7 +7,7 @@ from markdown import generate_page, generate_pages_recursive
 def main():
     basepath = "/"
     destination = "docs"
-    if len(sys.argv) == 2:
+    if len(sys.argv) > 1:
         basepath = sys.argv[1]
     
     os_copy("static", destination)
