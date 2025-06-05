@@ -1,11 +1,12 @@
 import os
 import shutil
 from textnode import *
-from markdown import generate_page
+from markdown import generate_page, generate_pages_recursive
 
 def main():
     os_copy("static", "public")
-    generate_page("content/index.md","template.html","public/index.html")
+    # generate_page("content/index.md","template.html","public/index.html")
+    generate_pages_recursive("content", "template.html", "public")
 
 
 def os_copy(src, dst):
