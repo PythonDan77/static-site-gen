@@ -117,7 +117,7 @@ def text_to_textnodes(text):
 
     return result
 
-#---------------------------------NEW-------------------------------------------
+#---------------------------------Block to HTML-------------------------------------------
 
 
 def markdown_to_html_node(markdown):
@@ -211,3 +211,14 @@ def markdown_to_blocks(markdown):
     if isinstance(markdown, str):
         modified = [line.strip() for line in markdown.split("\n\n") if line.strip()]
     return modified
+#------------------------Generate Page Functions-------------------------------
+def extract_title(markdown):
+    markdown_list = markdown.split("\n")
+    for line in markdown_list:
+        if line.startswith("# "):
+            line = line.replace("# " , "").strip()
+            return line
+    raise Exception("H1 Not Found")
+
+
+

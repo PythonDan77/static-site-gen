@@ -541,6 +541,27 @@ This is paragraph two with    space
                  "- List item",
             ],
         )
+#----------------------Extract H1 Title Function---------------------------
+
+class Test_Extract_Title_Func(unittest.TestCase): 
+    def test_proper_h1(self):
+        md ="""# Tolkien Fan Club
+
+![JRR Tolkien sitting](/images/tolkien.png)
+
+Here's the deal, **I like Tolkien**.
+
+> "I am in fact a Hobbit in all but size."
+>
+> -- J.R.R. Tolkien
+
+## Blog posts"""
+        result = extract_title(md)
+        self.assertEqual(result, "Tolkien Fan Club")
+
+    def test_no_h1_found(self):
+        with self.assertRaises(Exception):
+            result = extract_title("## Tolkien Fan Club")
 
     
 
