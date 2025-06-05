@@ -1,9 +1,11 @@
 import os
 import shutil
 from textnode import *
+from markdown import generate_page
 
 def main():
     os_copy("static", "public")
+    generate_page("content/index.md","template.html","public/index.html")
 
 
 def os_copy(src, dst):

@@ -1,4 +1,5 @@
 import re
+import os
 from enum import Enum  
 from textnode import *
 from htmlnode import *
@@ -219,6 +220,29 @@ def extract_title(markdown):
             line = line.replace("# " , "").strip()
             return line
     raise Exception("H1 Not Found")
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path, "r") as fp, open(template_path, "r") as tp:
+        md_file = fp.read()
+        template_file = tp.read()
+   
+    node = markdown_to_html_node(md_file)
+    template_file = template_file.replace("{{ Title }}", extract_title(md_file)).replace("{{ Content }}", node.to_html())
+    parent_dir = os.path.dirname(dest_path)
+    if not os.path.exists(parent_dir):
+        os.path.makedirs(parent_dir)
+    with open(dest_path, "w") as nf:
+        nf.write(template_file)
+
+    
+
+    
+    
+
+
+
+
 
 
 
